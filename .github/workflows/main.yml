@@ -20,7 +20,7 @@ permissions:
 env:
   DOTNET_VERSION: "8.0.x"
   # Point this to your xUnit test project (csproj). Adjust as needed. Minor change
-  TEST_PROJECT: "Library.Tests/Library.Tests.csproj"
+  TEST_PROJECT: "FoodSafety.Test/FoodSafety.Test.csproj"
 
 jobs:
   build-and-test:
@@ -73,7 +73,7 @@ jobs:
 
       # Only package for Pages when merging/pushing to main
       - name: Upload Pages artifact
-        if: github.event_name == 'push' && (github.ref == 'refs/heads/master'||github.ref == 'refs/heads/main')
+        if: github.event_name == 'push' && github.ref == 'refs/heads/master'
         uses: actions/upload-pages-artifact@v3
         with:
           path: ./coveragereport
