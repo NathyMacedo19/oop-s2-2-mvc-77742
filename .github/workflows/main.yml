@@ -18,9 +18,9 @@ permissions:
   id-token: write
 
 env:
-  DOTNET_VERSION: "8.0.x"
+  DOTNET_VERSION: "10.0.x"
   # Point this to your xUnit test project (csproj). Adjust as needed. Minor change
-  TEST_PROJECT: "FoodSafety.Tests/FoodSafety.Tests.csproj"
+  TEST_PROJECT: "FoodSafety.Test/FoodSafety.Test.csproj"
 
 jobs:
   build-and-test:
@@ -89,4 +89,5 @@ jobs:
     steps:
       - name: Deploy to GitHub Pages
         id: deployment
-        uses: actions/deploy-pages@v40a6ca639
+        uses: actions/deploy-pages@v4
+
