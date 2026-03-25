@@ -18,9 +18,9 @@ permissions:
   id-token: write
 
 env:
-  DOTNET_VERSION: "8.0.x"
+  DOTNET_VERSION: "10.0.x"
   # Point this to your xUnit test project (csproj). Adjust as needed. Minor change
-  TEST_PROJECT: "FoodSafety.Test/FoodSafety.Test.csproj"
+  TEST_PROJECT: "FoodSafetyInspection.Tests/FoodSafetyInspection.Tests.csproj"
 
 jobs:
   build-and-test:

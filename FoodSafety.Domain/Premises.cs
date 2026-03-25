@@ -9,10 +9,12 @@ namespace FoodSafety.Domain
     public class Premises
     {
         public int Id { get; set; }
-        public string Name { get; set; } = string.Empty;
-        public string Address { get; set; } = string.Empty;
-        public string Town { get; set; } = string.Empty;
-        public string RiskRating { get; set; } = string.Empty;
+        public string Name { get; set; }
+        public string Address { get; set; }
+        public string Town { get; set; }
+        public string RiskRating { get; set; } // Low/Medium/High
+
+        // Navigation property
         public ICollection<Inspection> Inspections { get; set; } = new List<Inspection>();
     }
 }

@@ -12,23 +12,34 @@ public class RegisterModel : PageModel
     }
 
     [BindProperty]
-    public InputModel Input { get; set; }
+    public InputModel Input { get; set; } 
 
     public class InputModel
     {
-        public string Email { get; set; }
-        public string Password { get; set; }
+        public required string Email { get; set; } = "";
+        public required string Password { get; set; } = "";
     }
 
     public void OnGet() { }
 
     public async Task<IActionResult> OnPostAsync()
     {
-        var user = new IdentityUser { UserName = Input.Email, Email = Input.Email };
+        if (!ModelState.IsValid)
+            return Page();
+
+        var user = new IdentityUser
+        {
+            UserName = Input.Email,
+            Email = Input.Email
+        };
+
         var result = await _userManager.CreateAsync(user, Input.Password);
 
         if (result.Succeeded)
             return RedirectToPage("Login");
+
+        foreach (var error in result.Errors)
+            ModelState.AddModelError("", error.Description);
 
         return Page();
     }

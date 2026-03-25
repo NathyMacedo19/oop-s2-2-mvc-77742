@@ -90,18 +90,18 @@ namespace FoodSafety.MVC.Data
             // Seed FollowUps
             if (!context.FollowUps.Any())
             {
-                var followUps = new List<Followup>
+                var followUps = new List<FollowUp>
                 {
-                    new Followup { InspectionId = 1, DueDate = DateTime.Now.AddDays(-10), Status = "Open" },
-                    new Followup { InspectionId = 4, DueDate = DateTime.Now.AddDays(-20), Status = "Open" },
-                    new Followup { InspectionId = 6, DueDate = DateTime.Now.AddDays(-15), Status = "Open" },
-                    new Followup { InspectionId = 7, DueDate = DateTime.Now.AddDays(7), Status = "Open" },
-                    new Followup { InspectionId = 10, DueDate = DateTime.Now.AddDays(-5), Status = "Open" },
-                    new Followup { InspectionId = 12, DueDate = DateTime.Now.AddDays(14), Status = "Open" },
-                    new Followup { InspectionId = 13, DueDate = DateTime.Now.AddDays(-30), Status = "Open" },
-                    new Followup { InspectionId = 16, DueDate = DateTime.Now.AddDays(-2), Status = "Closed", ClosedDate = DateTime.Now.AddDays(-1) },
-                    new Followup { InspectionId = 18, DueDate = DateTime.Now.AddDays(-25), Status = "Closed", ClosedDate = DateTime.Now.AddDays(-10) },
-                    new Followup { InspectionId = 20, DueDate = DateTime.Now.AddDays(-8), Status = "Closed", ClosedDate = DateTime.Now.AddDays(-3) },
+                    new FollowUp { InspectionId = 1, DueDate = DateTime.Now.AddDays(-10), Status = "Open" },
+                    new FollowUp { InspectionId = 4, DueDate = DateTime.Now.AddDays(-20), Status = "Open" },
+                    new FollowUp { InspectionId = 6, DueDate = DateTime.Now.AddDays(-15), Status = "Open" },
+                    new FollowUp { InspectionId = 7, DueDate = DateTime.Now.AddDays(7), Status = "Open" },
+                    new FollowUp { InspectionId = 10, DueDate = DateTime.Now.AddDays(-5), Status = "Open" },
+                    new FollowUp { InspectionId = 12, DueDate = DateTime.Now.AddDays(14), Status = "Open" },
+                    new FollowUp { InspectionId = 13, DueDate = DateTime.Now.AddDays(-30), Status = "Open" },
+                    new FollowUp { InspectionId = 16, DueDate = DateTime.Now.AddDays(-2), Status = "Closed", ClosedDate = DateTime.Now.AddDays(-1) },
+                    new FollowUp { InspectionId = 18, DueDate = DateTime.Now.AddDays(-25), Status = "Closed", ClosedDate = DateTime.Now.AddDays(-10) },
+                    new FollowUp { InspectionId = 20, DueDate = DateTime.Now.AddDays(-8), Status = "Closed", ClosedDate = DateTime.Now.AddDays(-3) },
                 };
                 context.FollowUps.AddRange(followUps);
                 await context.SaveChangesAsync();

@@ -1,8 +1,9 @@
-﻿using FoodSafety.MVC.Data;
-using FoodSafety.MVC.ViewModels;
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using FoodSafety.MVC.Data;
+using FoodSafety.MVC.ViewModels;
+using FoodSafety.Domain;
 
 namespace FoodSafety.MVC.Controllers
 {
@@ -10,75 +11,71 @@ namespace FoodSafety.MVC.Controllers
     public class DashboardController : Controller
     {
         private readonly AppDbContext _context;
+        private readonly ILogger<DashboardController> _logger;
 
-        public DashboardController(AppDbContext context)
+        public DashboardController(AppDbContext context, ILogger<DashboardController> logger)
         {
             _context = context;
+            _logger = logger;
         }
 
-        public async Task<IActionResult> Index(string? filterTown, string? filterRiskRating)
+        public async Task<IActionResult> Index(string? town, string? riskRating)
         {
-            var now = DateTime.Today;
-            var startOfMonth = new DateTime(now.Year, now.Month, 1);
+            _logger.LogInformation("Accessing Dashboard with filters - Town: {Town}, RiskRating: {RiskRating}",
+                town ?? "All", riskRating ?? "All");
 
-            // Base query for inspections - apply filters if provided
+            var today = DateTime.Today;
+            var firstDayOfMonth = new DateTime(today.Year, today.Month, 1);
+
+            // Start with base query
             var inspectionsQuery = _context.Inspections
                 .Include(i => i.Premises)
                 .AsQueryable();
 
-            if (!string.IsNullOrEmpty(filterTown))
-                inspectionsQuery = inspectionsQuery
-                    .Where(i => i.Premises.Town == filterTown);
+            // Apply filters
+            if (!string.IsNullOrEmpty(town))
+            {
+                inspectionsQuery = inspectionsQuery.Where(i => i.Premises.Town == town);
+                _logger.LogInformation("Filtering by town: {Town}", town);
+            }
 
-            if (!string.IsNullOrEmpty(filterRiskRating))
-                inspectionsQuery = inspectionsQuery
-                    .Where(i => i.Premises.RiskRating == filterRiskRating);
+            if (!string.IsNullOrEmpty(riskRating))
+            {
+                inspectionsQuery = inspectionsQuery.Where(i => i.Premises.RiskRating == riskRating);
+                _logger.LogInformation("Filtering by risk rating: {RiskRating}", riskRating);
+            }
 
-            // Count inspections this month
-            var inspectionsThisMonth = await inspectionsQuery
-                .Where(i => i.InspectionDate >= startOfMonth)
-                .CountAsync();
-
-            // Count failed inspections this month
-            var failedThisMonth = await inspectionsQuery
-                .Where(i => i.InspectionDate >= startOfMonth && i.Outcome == "Fail")
-                .CountAsync();
-
-            // Overdue follow-ups (DueDate past + still Open)
-            var overdueFollowUpsQuery = _context.FollowUps
-                .Include(f => f.Inspection)
-                .ThenInclude(i => i.Premises)
-                .Where(f => f.Status == "Open" && f.DueDate < now)
-                .AsQueryable();
-
-            if (!string.IsNullOrEmpty(filterTown))
-                overdueFollowUpsQuery = overdueFollowUpsQuery
-                    .Where(f => f.Inspection.Premises.Town == filterTown);
-
-            if (!string.IsNullOrEmpty(filterRiskRating))
-                overdueFollowUpsQuery = overdueFollowUpsQuery
-                    .Where(f => f.Inspection.Premises.RiskRating == filterRiskRating);
-
-            var overdueCount = await overdueFollowUpsQuery.CountAsync();
-
-            // Get distinct towns for dropdown
+            // Get unique filter values for dropdowns
             var towns = await _context.Premises
                 .Select(p => p.Town)
                 .Distinct()
                 .OrderBy(t => t)
                 .ToListAsync();
 
-            var viewModel = new DashboardViewModel
+            var riskRatings = await _context.Premises
+                .Select(p => p.RiskRating)
+                .Distinct()
+                .OrderBy(r => r)
+                .ToListAsync();
+
+            var model = new DashboardViewModel
             {
-                InspectionsThisMonth = inspectionsThisMonth,
-                FailedInspectionsThisMonth = failedThisMonth,
-                OverdueFollowUps = overdueCount,
-                FilterTown = filterTown,
-                FilterRiskRating = filterRiskRating,
-                Towns = towns
+                InspectionsThisMonth = await inspectionsQuery
+                    .CountAsync(i => i.InspectionDate >= firstDayOfMonth),
+
+                FailedInspectionsThisMonth = await inspectionsQuery
+                    .CountAsync(i => i.InspectionDate >= firstDayOfMonth && i.Outcome == "Fail"),
+
+                OverdueFollowUps = await _context.FollowUps
+                    .CountAsync(f => f.Status == "Open" && f.DueDate < today),
+
+                Towns = towns,
+                RiskRatings = riskRatings,
+                SelectedTown = town,
+                SelectedRiskRating = riskRating
             };
 
-            return View(viewModel);
+            return View(model);
         }
     }
 }

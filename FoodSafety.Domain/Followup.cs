@@ -6,13 +6,15 @@ using System.Threading.Tasks;
 
 namespace FoodSafety.Domain
 {
-    public class Followup
+    public class FollowUp
     {
         public int Id { get; set; }
         public int InspectionId { get; set; }
         public DateTime DueDate { get; set; }
-        public string Status { get; set; } = string.Empty;
+        public string Status { get; set; } // Open/Closed
         public DateTime? ClosedDate { get; set; }
-        public Inspection Inspection { get; set; } = null!;
+
+        // Navigation property
+        public Inspection Inspection { get; set; }
     }
 }

@@ -1,6 +1,8 @@
 using FoodSafety.MVC.Data;
+using FoodSafety.MVC.Middlewares;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Serilog;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -40,3 +42,23 @@ app.MapControllerRoute(
 app.MapRazorPages();
 
 app.Run();
+
+Log.Logger = new LoggerConfiguration()
+    .Enrich.WithProperty("Application", "FoodSafety.MVC")
+    .Enrich.WithProperty("Environment", Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "Production")
+    .Enrich.FromLogContext()
+    .WriteTo.Console()
+    .WriteTo.File("logs/foodsafety-.txt", rollingInterval: RollingInterval.Day)
+    .CreateLogger();
+
+builder.Host.UseSerilog();
+
+
+if (!app.Environment.IsDevelopment())
+{
+    app.UseExceptionHandler("/Home/Error");
+    app.UseHsts();
+}
+
+// After app.UseAuthentication() and app.UseAuthorization()
+app.UseMiddleware<SerilogUserEnricherMiddleware>();

@@ -53,7 +53,7 @@ namespace FoodSafety.MVC.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize(Roles = "Admin,Inspector")]
-        public async Task<IActionResult> Create(Followup followUp)
+        public async Task<IActionResult> Create(FollowUp followUp)
         {
             // Business rule: due date must be after inspection date
             var inspection = await _context.Inspections.FindAsync(followUp.InspectionId);
@@ -90,7 +90,7 @@ namespace FoodSafety.MVC.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize(Roles = "Admin,Inspector")]
-        public async Task<IActionResult> Edit(int id, Followup followUp)
+        public async Task<IActionResult> Edit(int id, FollowUp followUp)
         {
             if (id != followUp.Id) return NotFound();
 

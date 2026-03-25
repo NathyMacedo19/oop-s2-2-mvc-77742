@@ -1,86 +1,58 @@
-﻿using FoodSafety.Domain;
+﻿using Microsoft.EntityFrameworkCore;
 using FoodSafety.MVC.Data;
-using Microsoft.EntityFrameworkCore;
+using FoodSafety.Domain;
 
-namespace FoodSafety.Tests.Helpers
+namespace FoodSafety.Test
 {
     public static class TestDbHelper
     {
-        public static AppDbContext GetInMemoryDbContext()
+        public static AppDbContext CreateInMemoryDbContext()
         {
             var options = new DbContextOptionsBuilder<AppDbContext>()
-                .UseInMemoryDatabase(databaseName: Guid.NewGuid().ToString())
+                .UseInMemoryDatabase(Guid.NewGuid().ToString())
                 .Options;
 
-            var context = new AppDbContext(options);
+            return new AppDbContext(options);
+        }
 
-            // Seed test premises
-            var premises1 = new Premises
+        public static async Task<AppDbContext> SeedTestDataAsync()
+        {
+            var dbContext = CreateInMemoryDbContext();  // ← Type is AppDbContext, not object
+
+            var premises = new Premises
             {
                 Id = 1,
-                Name = "Boojum",
-                Address = "63 Abbey St Upper",
-                Town = "Dublin",
+                Name = "Test Restaurant",
+                Address = "123 Main St",
+                Town = "Bournemouth",
                 RiskRating = "High"
             };
-            var premises2 = new Premises
-            {
-                Id = 2,
-                Name = "Milano",
-                Address = "1 Dawson St",
-                Town = "Dublin",
-                RiskRating = "Low"
-            };
-            context.Premises.AddRange(premises1, premises2);
+            dbContext.Premises.Add(premises);  // ← Works because dbContext is AppDbContext
 
-            // Seed test inspections
-            var inspection1 = new Inspection
+            var inspection = new Inspection
             {
                 Id = 1,
                 PremisesId = 1,
-                InspectionDate = DateTime.Today.AddDays(-5),
-                Score = 40,
+                InspectionDate = DateTime.Today,
+                Score = 45,
                 Outcome = "Fail",
-                Notes = "Hygiene standards below acceptable level"
+                Notes = "Test inspection"
             };
-            var inspection2 = new Inspection
-            {
-                Id = 2,
-                PremisesId = 2,
-                InspectionDate = DateTime.Today.AddDays(-3),
-                Score = 90,
-                Outcome = "Pass",
-                Notes = "Excellent cleanliness observed"
-            };
-            context.Inspections.AddRange(inspection1, inspection2);
+            dbContext.Inspections.Add(inspection);  // ← Works
 
-            // Seed test follow-ups
-            var followUp1 = new Followup
+            var followup = new FollowUp
             {
                 Id = 1,
                 InspectionId = 1,
-                DueDate = DateTime.Today.AddDays(-10), // overdue
-                Status = "Open"
+                DueDate = DateTime.Today.AddDays(-1),
+                Status = "Open",
+                ClosedDate = null
             };
-            var followUp2 = new Followup
-            {
-                Id = 2,
-                InspectionId = 1,
-                DueDate = DateTime.Today.AddDays(5), // not overdue yet
-                Status = "Open"
-            };
-            var followUp3 = new Followup
-            {
-                Id = 3,
-                InspectionId = 2,
-                DueDate = DateTime.Today.AddDays(-20), // overdue but closed
-                Status = "Closed",
-                ClosedDate = DateTime.Today.AddDays(-5)
-            };
-            context.FollowUps.AddRange(followUp1, followUp2, followUp3);
+            dbContext.FollowUps.Add(followup);  // ← Works
 
-            context.SaveChanges();
-            return context;
+            await dbContext.SaveChangesAsync();
+
+            return dbContext;
         }
     }
 }

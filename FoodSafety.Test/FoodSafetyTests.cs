@@ -1,17 +1,20 @@
-﻿using FoodSafety.Domain;
-using FoodSafety.Tests.Helpers;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
+using Moq;
+using FoodSafety.MVC.Controllers;
+using FoodSafety.MVC.Data;
+using FoodSafety.Domain;
+using FoodSafety.MVC.ViewModels;
+using FoodSafety.Test;
 
-namespace FoodSafety.Tests
-{
-    public class FoodSafetyTests
+public class FoodSafetyTests
     {
         // Test 1: Overdue follow-ups query returns correct items
         [Fact]
         public async Task OverdueFollowUps_ReturnsOnlyOpenAndPastDueDate()
         {
             // Arrange
-            var context = TestDbHelper.GetInMemoryDbContext();
+            var context = await TestDbHelper.SeedTestDataAsync();
             var today = DateTime.Today;
 
             // Act
@@ -26,10 +29,10 @@ namespace FoodSafety.Tests
 
         // Test 2: Followup cannot be closed without a ClosedDate
         [Fact]
-        public void FollowUp_ClosedStatus_RequiresClosedDate()
+        public void Followup_ClosedStatus_RequiresClosedDate()
         {
             // Arrange
-            var followUp = new Followup
+            var followUp = new FollowUp
             {
                 Id = 4,
                 InspectionId = 1,
@@ -49,7 +52,7 @@ namespace FoodSafety.Tests
         public async Task Dashboard_InspectionsThisMonth_ReturnsCorrectCount()
         {
             // Arrange
-            var context = TestDbHelper.GetInMemoryDbContext();
+            var context = await TestDbHelper.SeedTestDataAsync();
             var startOfMonth = new DateTime(DateTime.Today.Year, DateTime.Today.Month, 1);
 
             // Act
@@ -67,7 +70,7 @@ namespace FoodSafety.Tests
         public async Task Dashboard_FailedInspectionsThisMonth_ReturnsCorrectCount()
         {
             // Arrange
-            var context = TestDbHelper.GetInMemoryDbContext();
+            var context = await TestDbHelper.SeedTestDataAsync();
             var startOfMonth = new DateTime(DateTime.Today.Year, DateTime.Today.Month, 1);
 
             // Act
@@ -84,7 +87,7 @@ namespace FoodSafety.Tests
         public async Task OverdueFollowUps_DoesNotIncludeClosedFollowUps()
         {
             // Arrange
-            var context = TestDbHelper.GetInMemoryDbContext();
+            var context = await TestDbHelper.SeedTestDataAsync();
 
             // Act
             var overdueFollowUps = await context.FollowUps
@@ -95,4 +98,3 @@ namespace FoodSafety.Tests
             Assert.DoesNotContain(overdueFollowUps, f => f.Id == 3);
         }
     }
-}
