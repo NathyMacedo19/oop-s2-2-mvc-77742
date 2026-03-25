@@ -1,0 +1,5 @@
+<Solution>
+  <Project Path="FoodSafety.Domain/FoodSafety.Domain.csproj" />
+  <Project Path="FoodSafety.MVC/FoodSafety.MVC.csproj" />
+  <Project Path="FoodSafety.Test/FoodSafety.Test.csproj" />
+</Solution>

@@ -1,0 +1,19 @@
+{
+  "exclude": [
+    "**/bin",
+    "**/bower_components",
+    "**/jspm_packages",
+    "**/node_modules",
+    "**/obj",
+    "**/platforms"
+  ]
+}
+
+{
+  "dependencies": {
+    "mssql1": {
+      "type": "mssql",
+      "connectionId": "ConnectionStrings:DefaultConnection"
+    }
+  }
+}
