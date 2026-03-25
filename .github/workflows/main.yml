@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 name: Test & Publish Coverage (xUnit + ReportGenerator)
 
 on:
